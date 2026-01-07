@@ -104,4 +104,22 @@ using Test
         @test_throws ErrorException @verifyfields (FieldTest, :f) (FieldTest, :g)
     end
 
+    @testset "Membership Verification" begin
+        C = [1, 2, 3]
+        e = 1
+        
+        # Success
+        @test isnothing(@verifyin e C)
+        @test isnothing(@verifyin 2 C)
+        
+        # Failure
+        @test_throws ErrorException @verifyin 4 C
+        
+        # Batch success
+        @test isnothing(@verifyins (1, C) (2, C))
+        
+        # Batch failure
+        @test_throws ErrorException @verifyins (1, C) (4, C)
+    end
+
 end

@@ -61,6 +61,29 @@ macro _verifykey_internal( d, k, n, src )
     end
 end
 
+@noinline function verifyin( e, C, name, location )
+    e ∈ C && return nothing
+    error( styled"""ArgumentError: {magenta:$name} does not belong to {green:$C}\n$location""" )
+end
+
+macro verifyin( e, C, n = string( e ) )
+    name = string( n )
+    return quote
+        local D, K = $(esc(e)), $(esc(C))
+        D ∈ K || verifyin(  D, K, $name, $(QuoteNode(__source__)) )  
+    end
+end
+
+# Internal macro for batch usage with explicit source
+macro _verifyin_internal( e, C, n, src )
+    name = string(n)
+    return quote
+        local E, C = $(esc(e)), $(esc(C))
+        verifyin( E, C, $name, $(esc(src)) )
+    end
+end
+
+
 
 @noinline function verifyproperty( d, prop, name, location )
     hasproperty( d, prop ) && return nothing
@@ -325,6 +348,32 @@ macro verifyaxes_list( T... )
                 push!( blk.args, :($(@__MODULE__).@_verifyaxes_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
             elseif length(args) == 3
                 push!( blk.args, :($(@__MODULE__).@_verifyaxes_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
+        else
+            error("All arguments must be tuples")
+        end
+    end
+    return esc(blk)
+end
+
+"""
+    @verifyins((element1, Collection1), (element2, Collection2), ...)
+
+Batch verify multiple membership checks. Each argument must be a tuple of `(element, Collection[, name])`.
+Equivalent to multiple `@verifyin` calls.
+"""
+macro verifyins( T... )
+    blk = quote end
+    src = QuoteNode(__source__)
+    for t ∈ T
+        if t isa Expr && t.head == :tuple
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifyin_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifyin_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
             else
                 error("Each tuple must have 2 or 3 arguments")
             end
