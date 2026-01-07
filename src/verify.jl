@@ -24,6 +24,15 @@ macro verifytype( v, t, n = string( v ) )
     end
 end
 
+# Internal macro for batch usage with explicit source
+macro _verifytype_internal( v, t, n, src )
+    name = string(n)
+    return quote
+        local val, T = $(esc(v)), $(esc(t))
+        verifytype( val, T, $name, $(esc(src)) )
+    end
+end
+
 @noinline function verifykey( d, key, name, location )
     haskey( d, key ) && return nothing
     error( styled"""KeyError: {red:$name} lacks key {green:$key}\n$location""" )
@@ -40,6 +49,15 @@ macro verifykey( d, k, n = string( d ) )
     return quote
         local D, K = $(esc(d)), $(esc(k))
         verifykey(  D, K, $name, $(QuoteNode(__source__)) ) 
+    end
+end
+
+# Internal macro for batch usage with explicit source
+macro _verifykey_internal( d, k, n, src )
+    name = string(n)
+    return quote
+        local D, K = $(esc(d)), $(esc(k))
+        verifykey(  D, K, $name, $(esc(src)) ) 
     end
 end
 
@@ -63,6 +81,15 @@ macro verifyproperty( d, k, n = string( d ) )
     end
 end
 
+# Internal macro for batch usage with explicit source
+macro _verifyproperty_internal( d, k, n, src )
+    name = string(n)
+    return quote
+        local D, K = $(esc(d)), $(esc(k))
+        verifyproperty(  D, K, $name, $(esc(src)) ) 
+    end
+end
+
 
 function verifysupertype( d, sup, name, location )
     d <: sup && return nothing
@@ -80,6 +107,15 @@ macro verifysupertype( d, k, n = string( d ) )
     return quote
         local D, K = $(esc(d)), $(esc(k))
         verifysupertype(  D, K, $name, $(QuoteNode(__source__)) ) 
+    end
+end
+
+# Internal macro for batch usage with explicit source
+macro _verifysupertype_internal( d, k, n, src )
+    name = string(n)
+    return quote
+        local D, K = $(esc(d)), $(esc(k))
+        verifysupertype(  D, K, $name, $(esc(src)) ) 
     end
 end
 
@@ -104,6 +140,15 @@ macro verifyaxes( d, k, n = string( d ) )
     end
 end
 
+# Internal macro for batch usage with explicit source
+macro _verifyaxes_internal( d, k, n, src )
+    name = string(n)
+    return quote
+        local D, K = $(esc(d)), $(esc(k))
+        verifyaxes( D, K, $name, $(esc(src)) )
+    end
+end
+
 
 @noinline function verifyfield( s, f, name, location )
     hasfield( s, f ) && return nothing
@@ -125,6 +170,15 @@ macro verifyfield( d, k, n = string( d ) )
     end
 end
 
+# Internal macro for batch usage with explicit source
+macro _verifyfield_internal( d, k, n, src )
+    name = string(n)
+    return quote
+        local D, K = $(esc(d)), $(esc(k))
+        verifyfield(  D, K, $name, $(esc(src)) ) 
+    end
+end
+
 """
     @verifytypes((value1, Type1), (value2, Type2), ...)
 
@@ -133,9 +187,17 @@ Equivalent to multiple `@verifytype` calls.
 """
 macro verifytypes( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifytype( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifytype_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifytype_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
@@ -151,9 +213,17 @@ Equivalent to multiple `@verifykey` calls.
 """
 macro verifykeys( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifykey( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifykey_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifykey_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
@@ -169,9 +239,17 @@ Equivalent to multiple `@verifysupertype` calls.
 """
 macro verifysupertypes( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifysupertype( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifysupertype_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifysupertype_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
@@ -187,9 +265,17 @@ Equivalent to multiple `@verifyproperty` calls.
 """
 macro verifyproperties( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifyproperty( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifyproperty_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifyproperty_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
@@ -205,9 +291,17 @@ Equivalent to multiple `@verifyfield` calls.
 """
 macro verifyfields( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifyfield( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifyfield_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifyfield_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
@@ -223,9 +317,17 @@ Equivalent to multiple `@verifyaxes` calls.
 """
 macro verifyaxes_list( T... )
     blk = quote end
+    src = QuoteNode(__source__)
     for t ∈ T
         if t isa Expr && t.head == :tuple
-            push!( blk.args, :($(@__MODULE__).@verifyaxes( $(t.args...) ) ) )
+            args = t.args
+            if length(args) == 2
+                push!( blk.args, :($(@__MODULE__).@_verifyaxes_internal( $(args[1]), $(args[2]), $(args[1]), $src ) ) )
+            elseif length(args) == 3
+                push!( blk.args, :($(@__MODULE__).@_verifyaxes_internal( $(args[1]), $(args[2]), $(args[3]), $src ) ) )
+            else
+                error("Each tuple must have 2 or 3 arguments")
+            end
         else
             error("All arguments must be tuples")
         end
