@@ -141,3 +141,4 @@ d = Dict(:a => 1, :b => 2)
 ```julia
 @verifyfields (MyType, :f) (OtherType, :x)
 ```
+
