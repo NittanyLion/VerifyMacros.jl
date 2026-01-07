@@ -79,10 +79,10 @@ Verify that an array has specific axes.
 
 ```julia
 A = [1, 2]
-@verifyaxes A (Base.OneTo(2),)
+@verifyaxes A (1:2,)
 # No error
 
-@verifyaxes A (Base.OneTo(3),)
+@verifyaxes A (1:3,)
 # Throws: DimensionMismatch: A has axes (Base.OneTo(2),): was expecting (Base.OneTo(3),)
 ```
 
