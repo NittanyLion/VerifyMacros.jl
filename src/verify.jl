@@ -4,7 +4,7 @@ using StyledStrings
 @noinline function verifytype( val :: Tᵛ, T, name, location ) where Tᵛ
     Tᵛ <: T && return nothing
     # throw( TypeError( location, T, Tᵛ ) )
-    error( styled"""TypeError: {red:$name} is of type {red:$Tᵛ}; was expecting a {green:$T}\n$location""" )
+    error( styled"""TypeError: {magenta:$name} is of type {red:$Tᵛ}; was expecting a {green:$T}\n$location""" )
 end
 
 
@@ -35,7 +35,7 @@ end
 
 @noinline function verifykey( d, key, name, location )
     haskey( d, key ) && return nothing
-    error( styled"""KeyError: {red:$name} lacks key {green:$key}\n$location""" )
+    error( styled"""KeyError: {magenta:$name} lacks key {green:$key}\n$location""" )
 end
 
 """
@@ -64,7 +64,7 @@ end
 
 @noinline function verifyproperty( d, prop, name, location )
     hasproperty( d, prop ) && return nothing
-    error( styled"""KeyError: {red:$name} lacks property {green:$prop}\n$location""" )
+    error( styled"""KeyError: {magenta:$name} lacks property {green:$prop}\n$location""" )
 end
 
 """
@@ -93,7 +93,7 @@ end
 
 function verifysupertype( d, sup, name, location )
     d <: sup && return nothing
-    error( styled"""TypeError: {red:$d} was expected to be a subtype of {green:$sup}\n$location""" )
+    error( styled"""TypeError: {magenta:$d} was expected to be a subtype of {green:$sup}\n$location""" )
 end
 
 """
@@ -121,7 +121,7 @@ end
 
 @noinline function verifyaxes( d, ax, name, location )
     axes( d ) == ax && return nothing
-    error( styled"""DimensionMismatch: {red:$name} has axes {red:$(axes(d))}: was expecting {green:$ax}\n$location""" )
+    error( styled"""DimensionMismatch: {magenta:$name} has axes {red:$(axes(d))}: was expecting {green:$ax}\n$location""" )
 end
 
 
@@ -152,7 +152,7 @@ end
 
 @noinline function verifyfield( s, f, name, location )
     hasfield( s, f ) && return nothing
-    error( styled"""KeyError: {red:$name} lacks field {green:$f}\n$location""" )
+    error( styled"""KeyError: {magenta:$name} lacks field {green:$f}\n$location""" )
 end
 
 
