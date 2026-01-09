@@ -83,7 +83,7 @@ A = [1, 2]
 # No error
 
 @verifyaxes A (1:3,)
-# Throws: DimensionMismatch: A has axes (Base.OneTo(2),): was expecting (Base.OneTo(3),)
+# Throws: DimensionMismatch: A has axes (1:2,): was expecting (1:3,)
 ```
 
 #### `@verifyfield`
@@ -194,7 +194,7 @@ d = Dict(:a => 1, :b => 2)
 #### `@verifyaxesm`
 
 ```julia
-@verifyaxesm (A, (Base.OneTo(2),)) (B, (Base.OneTo(3),))
+@verifyaxesm (A, (1:2,)) (B, (1:3,))
 ```
 
 #### `@verifyfields`

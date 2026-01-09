@@ -31,7 +31,7 @@ include( "verify.jl" )
         verifysupertype(Int, Integer, "int_type", l)
         
         # Exercise verifyaxes
-        verifyaxes(arr, (Base.OneTo(1),), "arr", l)
+        verifyaxes(arr, (1:1,), "arr", l)
         
         # Exercise verifyfield
         verifyfield(Complex{Int}, :re, "complex", l)

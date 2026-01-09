@@ -73,16 +73,16 @@ using Test
     @testset "Axes Verification" begin
         A = [1, 2]
         # Success
-        @test isnothing(@verifyaxes A (Base.OneTo(2),))
+        @test isnothing(@verifyaxes A (1:2,))
         
         # Failure
-        @test_throws ErrorException @verifyaxes A (Base.OneTo(3),)
+        @test_throws ErrorException @verifyaxes A (1:3,)
         
         # Batch success
-        @test isnothing(@verifyaxesm (A, (Base.OneTo(2),)))
+        @test isnothing(@verifyaxesm (A, (1:2,)))
         
         # Batch failure
-        @test_throws ErrorException @verifyaxesm (A, (Base.OneTo(3),))
+        @test_throws ErrorException @verifyaxesm (A, (1:3,))
     end
 
     @testset "Field Verification" begin
