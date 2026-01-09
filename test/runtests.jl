@@ -1,7 +1,11 @@
 using VerifyMacros
 using Test
+using Aqua
 
 @testset "VerifyMacros.jl" begin
+    @testset "Aqua" begin
+        Aqua.test_all(VerifyMacros)
+    end
 
     @testset "Type Verification" begin
         x = 1.0

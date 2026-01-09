@@ -83,6 +83,7 @@ To add a new verification macro:
 
 - **Type Checking**: Uses `isa` (or `<:`) implicitly via dispatch or explicit checks.
 - **Key/Property Checking**: Uses `haskey`, `hasproperty`, `hasfield`.
+- **Equality/Comparison**: Uses `==`, `length`, `size`, `isfile`, `isdir`, etc.
 - **Error Formatting**: Always provide what was found vs. what was expected.
 
 ## Testing
@@ -90,3 +91,4 @@ To add a new verification macro:
 Tests are written using `Test`.
 - `isnothing(...)` is used to assert that a verification passes (returns `nothing`).
 - `@test_throws ErrorException ...` is used to assert that a verification fails as expected. Note that even though the error message says "TypeError", the actual exception type thrown might be `ErrorException` depending on implementation (currently `error(...)` throws `ErrorException`).
+- **Aqua**: Aqua (Auto Quality Assurance) tests are included to check for code quality issues like stale dependencies, unbound args, etc.
