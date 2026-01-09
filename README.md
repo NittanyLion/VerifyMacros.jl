@@ -3,6 +3,7 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://NittanyLion.github.io/VerifyMacros.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://NittanyLion.github.io/VerifyMacros.jl/dev/)
 [![Build Status](https://github.com/NittanyLion/VerifyMacros.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/NittanyLion/VerifyMacros.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 `VerifyMacros.jl` provides a collection of utility macros for runtime verification in Julia. These macros allow you to assert conditions (like type checks, key existence, property existence, etc.) and throw descriptive, styled error messages when those assertions fail.
 
