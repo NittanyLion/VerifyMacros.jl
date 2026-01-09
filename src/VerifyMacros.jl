@@ -3,7 +3,9 @@ module VerifyMacros
 using PrecompileTools
 
 export @verifytype, @verifykey, @verifyproperty, @verifysupertype, @verifyaxes, @verifyfield, @verifyin, @verifyins
-export @verifytypes, @verifykeys, @verifyproperties, @verifysupertypes, @verifyaxes_list, @verifyfields
+export @verifytypes, @verifykeys, @verifyproperties, @verifysupertypes, @verifyaxesm, @verifyfields
+export @verifyequal, @verifylength, @verifysize, @verifyisfile, @verifyisdir, @verifytrue
+export @verifyequals, @verifylengths, @verifysizes, @verifyisfiles, @verifyisdirs, @verifytrues
 
 include( "verify.jl" )
 

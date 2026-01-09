@@ -10,7 +10,7 @@ Documentation for [VerifyMacros.jl](https://github.com/NittanyLion/VerifyMacros.
 
 ## Overview
 
-This package provides convenient macros that verify whether given variables have given properties.  These macros apply to types, fields, keys, properties, axes, and supertypes. 
+This package provides convenient macros that verify whether given variables have given properties.  These macros apply to types, fields, keys, properties, axes, supertypes, equality, length, size, file/directory existence, and generic conditions.
 
 For instance,
 ```

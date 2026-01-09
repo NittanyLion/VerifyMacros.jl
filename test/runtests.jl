@@ -79,10 +79,10 @@ using Test
         @test_throws ErrorException @verifyaxes A (Base.OneTo(3),)
         
         # Batch success
-        @test isnothing(@verifyaxes_list (A, (Base.OneTo(2),)))
+        @test isnothing(@verifyaxesm (A, (Base.OneTo(2),)))
         
         # Batch failure
-        @test_throws ErrorException @verifyaxes_list (A, (Base.OneTo(3),))
+        @test_throws ErrorException @verifyaxesm (A, (Base.OneTo(3),))
     end
 
     @testset "Field Verification" begin
@@ -120,6 +120,89 @@ using Test
         
         # Batch failure
         @test_throws ErrorException @verifyins (1, C) (4, C)
+    end
+
+    @testset "Equality Verification" begin
+        x = 5
+        # Success
+        @test isnothing(@verifyequal x 5)
+        
+        # Failure
+        @test_throws ErrorException @verifyequal x 6
+        
+        # Batch
+        @test isnothing(@verifyequals (x, 5) (10, 10))
+        @test_throws ErrorException @verifyequals (x, 5) (x, 6)
+    end
+
+    @testset "Length Verification" begin
+        col = [1, 2, 3]
+        # Success
+        @test isnothing(@verifylength col 3)
+        
+        # Failure
+        @test_throws ErrorException @verifylength col 2
+        
+        # Batch
+        @test isnothing(@verifylengths (col, 3) ([], 0))
+        @test_throws ErrorException @verifylengths (col, 3) (col, 2)
+    end
+
+    @testset "Size Verification" begin
+        arr = [1 2; 3 4]
+        # Success
+        @test isnothing(@verifysize arr (2, 2))
+        
+        # Failure
+        @test_throws ErrorException @verifysize arr (2, 3)
+        
+        # Batch
+        @test isnothing(@verifysizes (arr, (2, 2)))
+        @test_throws ErrorException @verifysizes (arr, (2, 3))
+    end
+
+    @testset "FileSystem Verification" begin
+        # Create temp resources
+        tmpfile, io = mktemp()
+        close(io)
+        tmpdir = mktempdir()
+        
+        try
+            # File Success
+            @test isnothing(@verifyisfile tmpfile)
+            # File Failure (dir is not file, or non-existent)
+            @test_throws ErrorException @verifyisfile tmpdir
+            @test_throws ErrorException @verifyisfile "non_existent_file"
+            
+            # Dir Success
+            @test isnothing(@verifyisdir tmpdir)
+            # Dir Failure
+            @test_throws ErrorException @verifyisdir tmpfile
+            @test_throws ErrorException @verifyisdir "non_existent_dir"
+            
+            # Batch
+            @test isnothing(@verifyisfiles (tmpfile))
+            @test isnothing(@verifyisdirs (tmpdir))
+            # Test batch tuple with name
+            @test isnothing(@verifyisfiles (tmpfile, "temp file"))
+            
+        finally
+            rm(tmpfile, force=true)
+            rm(tmpdir, recursive=true, force=true)
+        end
+    end
+
+    @testset "Generic Verification" begin
+        x = 10
+        # Success
+        @test isnothing(@verifytrue x > 5)
+        
+        # Failure
+        @test_throws ErrorException @verifytrue x < 5
+        
+        # Batch
+        @test isnothing(@verifytrues (x > 5) (x == 10))
+        @test_throws ErrorException @verifytrues (x > 5) (x < 5)
     end
 
 end

@@ -101,6 +101,67 @@ end
 # Throws: KeyError: MyType lacks field :g
 ```
 
+#### `@verifyin`
+Verify that an element is in a collection.
+
+```julia
+C = [1, 2, 3]
+@verifyin 1 C
+# No error
+
+@verifyin 4 C
+# Throws: ArgumentError: 4 does not belong to [1, 2, 3]
+```
+
+#### `@verifyequal`
+Verify that two values are equal.
+
+```julia
+@verifyequal 1 1
+# No error
+
+@verifyequal 1 2
+# Throws: ArgumentError: 1 is 1; was expecting 2
+```
+
+#### `@verifylength`
+Verify the length of a collection.
+
+```julia
+col = [1, 2]
+@verifylength col 2
+# No error
+
+@verifylength col 3
+# Throws: DimensionMismatch: col has length 2; was expecting 3
+```
+
+#### `@verifysize`
+Verify the size of an array.
+
+```julia
+arr = [1 2; 3 4]
+@verifysize arr (2, 2)
+# No error
+```
+
+#### `@verifyisfile` / `@verifyisdir`
+Verify file or directory existence.
+
+```julia
+@verifyisfile "existing_file.txt"
+@verifyisdir "existing_dir"
+```
+
+#### `@verifytrue`
+Generic assertion.
+
+```julia
+x = 10
+@verifytrue x > 5
+# No error
+```
+
 ### Batch Verification Macros
 
 For verifying multiple conditions at once, the package provides pluralized versions of the macros. These accept tuples of arguments.
@@ -130,15 +191,52 @@ d = Dict(:a => 1, :b => 2)
 @verifysupertypes (Int, Integer) (Float64, Real)
 ```
 
-#### `@verifyaxes_list`
+#### `@verifyaxesm`
 
 ```julia
-@verifyaxes_list (A, (Base.OneTo(2),)) (B, (Base.OneTo(3),))
+@verifyaxesm (A, (Base.OneTo(2),)) (B, (Base.OneTo(3),))
 ```
 
 #### `@verifyfields`
 
 ```julia
 @verifyfields (MyType, :f) (OtherType, :x)
+```
+
+#### `@verifyins`
+
+```julia
+@verifyins (1, [1, 2]) ("a", Set(["a", "b"]))
+```
+
+#### `@verifyequals`
+
+```julia
+@verifyequals (1, 1) (x, 5)
+```
+
+#### `@verifylengths`
+
+```julia
+@verifylengths ([1], 1) ([], 0)
+```
+
+#### `@verifysizes`
+
+```julia
+@verifysizes (arr, (2, 2))
+```
+
+#### `@verifyisfiles` / `@verifyisdirs`
+
+```julia
+@verifyisfiles ("file1.txt",) ("file2.txt",)
+@verifyisdirs ("dir1",)
+```
+
+#### `@verifytrues`
+
+```julia
+@verifytrues (x > 5,) (y < 10,)
 ```
 
