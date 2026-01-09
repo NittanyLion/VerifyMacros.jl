@@ -1,8 +1,8 @@
 using StyledStrings
 
 
-@noinline function verifytype( val :: Tᵛ, T, name, location ) where Tᵛ
-    Tᵛ <: T && return nothing
+@noinline function verifytype( val, T, name, location ) 
+    val isa T && return nothing
     # throw( TypeError( location, T, Tᵛ ) )
     error( styled"""TypeError: {magenta:$name} is of type {red:$Tᵛ}; was expecting a {green:$T}\n$location""" )
 end
