@@ -1,243 +1,119 @@
-# VerifyMacros.jl
+# VerifyMacros.jl 🕵️‍♂️✅
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://NittanyLion.github.io/VerifyMacros.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://NittanyLion.github.io/VerifyMacros.jl/dev/)
 [![Build Status](https://github.com/NittanyLion/VerifyMacros.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/NittanyLion/VerifyMacros.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
-`VerifyMacros.jl` provides a collection of utility macros for runtime verification in Julia. These macros allow you to assert conditions (like type checks, key existence, property existence, etc.) and throw descriptive, styled error messages when those assertions fail.
+**VerifyMacros.jl** is your toolkit for **runtime verification** with **style**. 💅
 
-## Installation
+Stop writing boilerplate checks and manual error messages. Use `VerifyMacros` to assert conditions and get descriptive, color-coded error output that tells you exactly what went wrong.
 
-You can install the package using the Julia package manager:
+---
+
+## 🆚 Comparison with ArgCheck.jl
+
+You might know [ArgCheck.jl](https://github.com/jw3126/ArgCheck.jl), which is excellent for concise argument checking. Here's how `VerifyMacros.jl` differs:
+
+| Feature | ArgCheck.jl (`@argcheck`) | VerifyMacros.jl (`@verify...`) |
+| :--- | :--- | :--- |
+| **Philosophy** | Concise preconditions | Descriptive, specific failure context |
+| **Error Type** | `ArgumentError` (mostly) | `TypeError`, `KeyError`, `DimensionMismatch`, etc. |
+| **Message** | Generic or manual string | **Auto-generated**, descriptive, and **styled** (colored) |
+| **Usage** | `@argcheck x > 0` | `@verifytype x Int` or `@verifykey d :id` |
+| **Best For** | Function preconditions | Data validation, debugging complex state, helpful errors |
+
+**Choose VerifyMacros.jl when you want your users (or future you) to know exactly _why_ a check failed without digging into the stack trace.**
+
+---
+
+## 📦 Installation
 
 ```julia
 using Pkg
 Pkg.add("VerifyMacros")
 ```
 
-## Usage
+---
 
-### Single Verification Macros
+## 🚀 Usage
 
-The package exports several macros for verifying different properties of your data. Each macro takes an optional `name` argument to customize the error message.
+### 🔍 Single Verifications
 
-#### `@verifytype`
-Verify that a value is of a specific type.
+Validate types, keys, dimensions, and more.
 
+#### Types & Structure
 ```julia
 using VerifyMacros
 
 x = 1.0
-@verifytype x Float64
-# No error
-
-@verifytype x Int
-# Throws: TypeError: x is of type Float64; was expecting a Int
+@verifytype x Float64  # ✅ Passes
+@verifytype x Int      # ❌ Throws: TypeError: x is of type Float64; was expecting a Int
 ```
 
-#### `@verifykey`
-Verify that a dictionary (or other object supporting `haskey`) contains a specific key.
-
+#### Dictionaries & Properties
 ```julia
 d = Dict(:a => 1)
-@verifykey d :a
-# No error
+@verifykey d :a        # ✅ Passes
+@verifykey d :b        # ❌ Throws: KeyError: d lacks key :b
 
-@verifykey d :b
-# Throws: KeyError: d lacks key :b
+struct Obj; p; end
+o = Obj(1)
+@verifyproperty o :p   # ✅ Passes
 ```
 
-#### `@verifyproperty`
-Verify that an object has a specific property.
-
-```julia
-struct MyStruct
-    p::Int
-end
-obj = MyStruct(1)
-
-@verifyproperty obj :p
-# No error
-
-@verifyproperty obj :q
-# Throws: KeyError: obj lacks property :q
-```
-
-#### `@verifysupertype`
-Verify that a type is a subtype of another type.
-
-```julia
-@verifysupertype Int Integer
-# No error
-
-@verifysupertype Int AbstractFloat
-# Throws: TypeError: Int64 was expected to be a subtype of AbstractFloat
-```
-
-#### `@verifyaxes`
-Verify that an array has specific axes.
-
+#### Collections & Dimensions
 ```julia
 A = [1, 2]
-@verifyaxes A (1:2,)
-# No error
-
-@verifyaxes A (1:3,)
-# Throws: DimensionMismatch: A has axes (1:2,): was expecting (1:3,)
+@verifyaxes A (1:2,)   # ✅ Passes
+@verifyin 1 A          # ✅ Passes
+@verifylength A 2      # ✅ Passes
 ```
 
-#### `@verifyfield`
-Verify that a type has a specific field.
+### 📦 Batch Verifications
+
+Check everything at once. Clean and efficient.
 
 ```julia
-struct MyType
-    f::Int
-end
+# Check multiple types
+@verifytypes (x, Float64) (1, Int)
 
-@verifyfield MyType :f
-# No error
-
-@verifyfield MyType :g
-# Throws: KeyError: MyType lacks field :g
-```
-
-#### `@verifyin`
-Verify that an element is in a collection.
-
-```julia
-C = [1, 2, 3]
-@verifyin 1 C
-# No error
-
-@verifyin 4 C
-# Throws: ArgumentError: 4 does not belong to [1, 2, 3]
-```
-
-#### `@verifyequal`
-Verify that two values are equal.
-
-```julia
-@verifyequal 1 1
-# No error
-
-@verifyequal 1 2
-# Throws: ArgumentError: 1 is 1; was expecting 2
-```
-
-#### `@verifylength`
-Verify the length of a collection.
-
-```julia
-col = [1, 2]
-@verifylength col 2
-# No error
-
-@verifylength col 3
-# Throws: DimensionMismatch: col has length 2; was expecting 3
-```
-
-#### `@verifysize`
-Verify the size of an array.
-
-```julia
-arr = [1 2; 3 4]
-@verifysize arr (2, 2)
-# No error
-```
-
-#### `@verifyisfile` / `@verifyisdir`
-Verify file or directory existence.
-
-```julia
-@verifyisfile "existing_file.txt"
-@verifyisdir "existing_dir"
-```
-
-#### `@verifytrue`
-Generic assertion.
-
-```julia
-x = 10
-@verifytrue x > 5
-# No error
-```
-
-### Batch Verification Macros
-
-For verifying multiple conditions at once, the package provides pluralized versions of the macros. These accept tuples of arguments.
-
-#### `@verifytypes`
-
-```julia
-@verifytypes (1.0, Float64) ("hello", String)
-```
-
-#### `@verifykeys`
-
-```julia
-d = Dict(:a => 1, :b => 2)
+# Check multiple keys
 @verifykeys (d, :a) (d, :b)
+# OR shorthand for one dict:
+@verifykeys(d, :a, :b, :c)
+
+# Check multiple files
+@verifyisfiles ("config.json",) ("data.csv",)
 ```
 
-#### `@verifyproperties`
+### 🛠️ Available Macros
 
-```julia
-@verifyproperties (obj, :p) (obj, :other_prop)
-```
+| Macro | Description |
+| :--- | :--- |
+| `@verifytype` | Check type of value (`isa`) |
+| `@verifykey` | Check key in dictionary (`haskey`) |
+| `@verifyproperty` | Check property of object (`hasproperty`) |
+| `@verifyfield` | Check field of type (`hasfield`) |
+| `@verifyin` | Check membership (`in`) |
+| `@verifysupertype`| Check subtype relation (`<:`) |
+| `@verifyaxes` | Check array axes |
+| `@verifysize` | Check array size |
+| `@verifylength` | Check collection length |
+| `@verifyequal` | Check equality (`==`) |
+| `@verifyisfile` | Check file existence |
+| `@verifyisdir` | Check directory existence |
+| `@verifytrue` | Generic assertion |
 
-#### `@verifysupertypes`
+*All macros have plural versions (e.g., `@verifytypes`) for batch checking.*
 
-```julia
-@verifysupertypes (Int, Integer) (Float64, Real)
-```
+---
 
-#### `@verifyaxesm`
+## 🎨 Error Messages
 
-```julia
-@verifyaxesm (A, (1:2,)) (B, (1:3,))
-```
+When a check fails, `VerifyMacros` uses `StyledStrings` to highlight the culprit.
 
-#### `@verifyfields`
+> **TypeError**: `my_var` is of type `String`; was expecting a `Int64`  
+> *at /path/to/file.jl:10*
 
-```julia
-@verifyfields (MyType, :f) (OtherType, :x)
-```
-
-#### `@verifyins`
-
-```julia
-@verifyins (1, [1, 2]) ("a", Set(["a", "b"]))
-```
-
-#### `@verifyequals`
-
-```julia
-@verifyequals (1, 1) (x, 5)
-```
-
-#### `@verifylengths`
-
-```julia
-@verifylengths ([1], 1) ([], 0)
-```
-
-#### `@verifysizes`
-
-```julia
-@verifysizes (arr, (2, 2))
-```
-
-#### `@verifyisfiles` / `@verifyisdirs`
-
-```julia
-@verifyisfiles ("file1.txt",) ("file2.txt",)
-@verifyisdirs ("dir1",)
-```
-
-#### `@verifytrues`
-
-```julia
-@verifytrues (x > 5,) (y < 10,)
-```
-
+(Imagine that with colors! 🌈)
