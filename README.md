@@ -26,6 +26,7 @@ You might know [ArgCheck.jl](https://github.com/jw3126/ArgCheck.jl), which is ex
 
 **Choose VerifyMacros.jl when you want your users (or future you) to know exactly _why_ a check failed without digging into the stack trace, especially when checking multiple constraints simultaneously.**
 
+### A detailed comparison can be found in the documentation (click on the docs shield above) 
 ---
 
 ## 📦 Installation
