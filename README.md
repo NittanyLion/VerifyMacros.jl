@@ -117,3 +117,13 @@ When a check fails, `VerifyMacros` uses `StyledStrings` to highlight the culprit
 > *at /path/to/file.jl:10*
 
 (Imagine that with colors! 🌈)
+
+### 🛠️ The Meta-Macro: `@verify`
+
+If you prefer a single entry point, use `@verify`. The first argument is a symbol (e.g., `:type`, `:keys`) which determines which check to run.
+
+```julia
+@verify :type x Float64      # expands to @verifytype x Float64
+@verify :keys d :a :b        # expands to @verifykeys d :a :b
+@verify :true 1 < 2          # expands to @verifytrue 1 < 2
+```

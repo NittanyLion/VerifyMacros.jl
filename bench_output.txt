@@ -1,0 +1,43 @@
+Benchmarking @verifytype vs @argcheck (isa Int)
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  1.212 ns … 12.343 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     1.222 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.235 ns ±  0.326 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▄ ▂                        █  ▇                        ▃ ▁ ▁
+  █▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁█ █
+  1.21 ns      Histogram: log(frequency) by time     1.23 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  1.172 ns … 63.131 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     1.212 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.250 ns ±  1.129 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+       ▁█                                                     
+  ▂▇▁▆▁██▁█▁▂▂▁▂▁▂▁▁▂▁▂▁▂▂▂▂▁▂▂▁▂▁▂▁▂▂▁▂▁▂▁▂▂▁▂▁▂▁▁▂▁▂▂▂▂▁▂▂ ▂
+  1.17 ns        Histogram: frequency by time        1.51 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+Benchmarking @verifytrue vs @argcheck (x > 0)
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  6.352 ns … 96.455 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     6.433 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   6.691 ns ±  2.243 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  █▇▂                                                        ▁
+  ████▇▇▅▆▆▆▆▆▅▇█▆▅▄▄▄▃▅▄▄▃▄▄▄▄▃▃▃▄▁▄▁▁▁▄▃▄▃▃▄▄▄▃▃▃▄▄▃▁▃▁▅▆▇ █
+  6.35 ns      Histogram: log(frequency) by time     13.2 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  3.416 ns … 91.186 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     3.467 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   3.597 ns ±  1.803 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  █▇                                                         ▁
+  ██▆▅▆▆▆▇▆▅▅▆▅▅▅▅███▁▁▃▃▁▁▁▁▃▁▁▁▁▁▃▄▁▁▃▄▁▃▁▁▁▁▃▁▁▄▃▁▁▁▁▁▁▁▄ █
+  3.42 ns      Histogram: log(frequency) by time     6.45 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.

@@ -4,7 +4,7 @@ using PrecompileTools
 
 export @verifytype, @verifykey, @verifyproperty, @verifysupertype, @verifyaxes, @verifyfield, @verifyin, @verifyins
 export @verifytypes, @verifykeys, @verifyproperties, @verifysupertypes, @verifyaxesm, @verifyfields
-export @verifyequal, @verifylength, @verifysize, @verifyisfile, @verifyisdir, @verifytrue
+export @verifyequal, @verifylength, @verifysize, @verifyisfile, @verifyisdir, @verifytrue, @verify
 export @verifyequals, @verifylengths, @verifysizes, @verifyisfiles, @verifyisdirs, @verifytrues
 
 include( "verify.jl" )

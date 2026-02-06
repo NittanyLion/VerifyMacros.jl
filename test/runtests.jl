@@ -210,3 +210,26 @@ using Aqua
     end
 
 end
+
+    @testset "Meta @verify Macro" begin
+        x = 1.0
+        d = Dict(:a => 1, :b => 2)
+        
+        # Test mapping to @verifytype
+        @test isnothing(@verify :type x Float64)
+        @test_throws ErrorException @verify :type x Int
+
+        # Test mapping to @verifykeys (using the shorthand syntax)
+        @test isnothing(@verify :keys d :a :b)
+        @test_throws ErrorException @verify :keys d :a :c
+        
+        # Test mapping to @verifytrue
+        @test isnothing(@verify :true 1 < 2)
+        
+        # Test invalid usage
+        # ex = Expr(:macrocall, Symbol("@verify"), LineNumberNode(@__LINE__, @__FILE__), "string", :x)
+        # @test_throws ErrorException eval(ex)
+        # Note: LoadError because macro expansion fails, but test_throws usually catches runtime errors. 
+        # Macro errors happen at expansion time. We can try to test expansion failure if needed, 
+        # but the main path is covered above.
+    end
