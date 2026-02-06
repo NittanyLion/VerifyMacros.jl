@@ -21,9 +21,10 @@ You might know [ArgCheck.jl](https://github.com/jw3126/ArgCheck.jl), which is ex
 | **Error Type** | `ArgumentError` (mostly) | `TypeError`, `KeyError`, `DimensionMismatch`, etc. |
 | **Message** | Generic or manual string | **Auto-generated**, descriptive, and **styled** (colored) |
 | **Usage** | `@argcheck x > 0` | `@verifytype x Int` or `@verifykey d :id` |
+| **Batch Checks** | Fails on combined expression | **Precise**: Identifies exactly *which* constraint failed in a batch |
 | **Best For** | Function preconditions | Data validation, debugging complex state, helpful errors |
 
-**Choose VerifyMacros.jl when you want your users (or future you) to know exactly _why_ a check failed without digging into the stack trace.**
+**Choose VerifyMacros.jl when you want your users (or future you) to know exactly _why_ a check failed without digging into the stack trace, especially when checking multiple constraints simultaneously.**
 
 ---
 
