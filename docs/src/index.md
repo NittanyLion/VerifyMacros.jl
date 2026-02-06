@@ -104,8 +104,6 @@ You might know [ArgCheck.jl](https://github.com/jw3126/ArgCheck.jl), which is ex
 !!! info "As the following comparison demonstrates, `VerifyMacros`,"
     * provides a detailed error message without further user interaction
     * colors are used to make it immediately apparent what the error is
-        - below, ArgCheck says that it cannot find needle, but not what needle is
-        - VerifyMacros tells the user exactly what it was looking for
     * identifies where in the code the error is
 
 
