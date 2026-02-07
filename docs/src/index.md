@@ -193,6 +193,7 @@ D = Dict( :a=>1, 2 =>:b, :c => :3 );
 
 | Macro | Description |
 | :--- | :--- |
+| `@verify` | Meta macro (see above) |
 | `@verifytype` | Check type of value (`isa`) |
 | `@verifykey` | Check key in dictionary (`haskey`) |
 | `@verifyproperty` | Check property of object (`hasproperty`) |
