@@ -129,7 +129,7 @@ If you prefer a single entry point, use `@verify`. The first argument is a symbo
 ```julia
 @verify :type x Float64      # expands to @verifytype x Float64
 @verify :keys d :a :b        # expands to @verifykeys d :a :b
-
+```
 ---
 
 ## 🤖 For AI Agents
