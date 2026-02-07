@@ -274,18 +274,196 @@ end
 
 # Standard verifications
 @define_verification verifytype      verifytypes       verifytype      2
+@doc """
+    @verifytype(val, T, [name])
+
+Check that `val` is of type `T` (using `<:`).
+If `name` is omitted, it defaults to the string representation of `val`.
+Throws a styled error if the check fails.
+""" var"@verifytype"
+
+@doc """
+    @verifytypes((val, T), ...)
+
+Batch verification for types.
+Usage: `@verifytypes((val1, T1), (val2, T2))`
+""" var"@verifytypes"
+
+
 @define_verification verifyproperty  verifyproperties  verifyproperty  2
+@doc """
+    @verifyproperty(val, prop, [name])
+
+Check that `val` has property `prop` (using `hasproperty`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifyproperty"
+
+@doc """
+    @verifyproperties((val, prop), ...)
+
+Batch verification for properties.
+Usage: `@verifyproperties((val1, prop1), (val2, prop2))`
+""" var"@verifyproperties"
+
+
 @define_verification verifysupertype verifysupertypes  verifysupertype 2
+@doc """
+    @verifysupertype(T, Sup, [name])
+
+Check that `T` is a subtype of `Sup` (using `<:`).
+Throws a styled `TypeError` if the check fails.
+""" var"@verifysupertype"
+
+@doc """
+    @verifysupertypes((T, Sup), ...)
+
+Batch verification for supertypes.
+Usage: `@verifysupertypes((T1, Sup1), (T2, Sup2))`
+""" var"@verifysupertypes"
+
+
 @define_verification verifyaxes      verifyaxesm       verifyaxes      2
+@doc """
+    @verifyaxes(val, ax, [name])
+
+Check that `val` has axes `ax` (using `axes(val) == ax`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifyaxes"
+
+@doc """
+    @verifyaxesm((val, ax), ...)
+
+Batch verification for axes.
+Usage: `@verifyaxesm((val1, ax1), (val2, ax2))`
+""" var"@verifyaxesm"
+
+
 @define_verification verifyfield     verifyfields      verifyfield     2
+@doc """
+    @verifyfield(val, field, [name])
+
+Check that `val` has field `field` (using `hasfield`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifyfield"
+
+@doc """
+    @verifyfields((val, field), ...)
+
+Batch verification for fields.
+Usage: `@verifyfields((val1, field1), (val2, field2))`
+""" var"@verifyfields"
+
+
 @define_verification verifyin        verifyins         verifyin        2
+@doc """
+    @verifyin(val, collection, [name])
+
+Check that `val` is in `collection` (using `val ∈ collection`).
+Throws a styled `ArgumentError` if the check fails.
+""" var"@verifyin"
+
+@doc """
+    @verifyins((val, collection), ...)
+
+Batch verification for membership.
+Usage: `@verifyins((val1, col1), (val2, col2))`
+""" var"@verifyins"
+
+
 @define_verification verifyequal     verifyequals      verifyequal     2
+@doc """
+    @verifyequal(val, expected, [name])
+
+Check that `val` is equal to `expected` (using `==`).
+Throws a styled `ArgumentError` if the check fails.
+""" var"@verifyequal"
+
+@doc """
+    @verifyequals((val, expected), ...)
+
+Batch verification for equality.
+Usage: `@verifyequals((val1, exp1), (val2, exp2))`
+""" var"@verifyequals"
+
+
 @define_verification verifylength    verifylengths     verifylength    2
+@doc """
+    @verifylength(val, len, [name])
+
+Check that `val` has length `len` (using `length(val) == len`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifylength"
+
+@doc """
+    @verifylengths((val, len), ...)
+
+Batch verification for lengths.
+Usage: `@verifylengths((val1, len1), (val2, len2))`
+""" var"@verifylengths"
+
+
 @define_verification verifysize      verifysizes       verifysize      2
+@doc """
+    @verifysize(val, size, [name])
+
+Check that `val` has size `size` (using `size(val) == size`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifysize"
+
+@doc """
+    @verifysizes((val, size), ...)
+
+Batch verification for sizes.
+Usage: `@verifysizes((val1, size1), (val2, size2))`
+""" var"@verifysizes"
+
 
 @define_verification verifyisfile    verifyisfiles     verifyisfile    1
+@doc """
+    @verifyisfile(path, [name])
+
+Check that `path` is an existing file (using `isfile`).
+Throws a styled `SystemError` if the check fails.
+""" var"@verifyisfile"
+
+@doc """
+    @verifyisfiles(path, ...)
+
+Batch verification for files.
+Usage: `@verifyisfiles(path1, path2)` or `@verifyisfiles((path1, name1), ...)`
+""" var"@verifyisfiles"
+
+
 @define_verification verifyisdir     verifyisdirs      verifyisdir     1
+@doc """
+    @verifyisdir(path, [name])
+
+Check that `path` is an existing directory (using `isdir`).
+Throws a styled `SystemError` if the check fails.
+""" var"@verifyisdir"
+
+@doc """
+    @verifyisdirs(path, ...)
+
+Batch verification for directories.
+Usage: `@verifyisdirs(path1, path2)` or `@verifyisdirs((path1, name1), ...)`
+""" var"@verifyisdirs"
+
+
 @define_verification verifytrue      verifytrues       verifytrue      1
+@doc """
+    @verifytrue(cond, [name])
+
+Check that `cond` is true.
+Throws a styled `AssertionError` if the check fails.
+""" var"@verifytrue"
+
+@doc """
+    @verifytrues(cond, ...)
+
+Batch verification for boolean conditions.
+Usage: `@verifytrues(cond1, cond2)` or `@verifytrues((cond1, name1), ...)`
+""" var"@verifytrues"
 
 
 # ==============================================================================
@@ -303,6 +481,12 @@ end
 # But let's just generate it and then REDEFINE @verifykeys. Julia allows this.
 
 @define_verification verifykey       _verifykeys_stub  verifykey       2
+@doc """
+    @verifykey(dict, key, [name])
+
+Check that `dict` has key `key` (using `haskey`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifykey"
 
 """
     @verifykeys((dict1, key1), (dict2, key2), ...)
