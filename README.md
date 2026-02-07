@@ -94,6 +94,7 @@ Check everything at once. Clean and efficient.
 
 | Macro | Description |
 | :--- | :--- |
+| `@verify` | "Meta macro (see further down)" |
 | `@verifytype` | Check type of value (`isa`) |
 | `@verifykey` | Check key in dictionary (`haskey`) |
 | `@verifyproperty` | Check property of object (`hasproperty`) |
