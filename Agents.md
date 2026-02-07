@@ -59,25 +59,31 @@ macro verifytype( v, t, n = string( v ) )
 end
 ```
 
-### Batch Macros
+### Helper Macro for Definition
 
-Batch macros (e.g., `@verifytypes`) take a variable number of arguments, where each argument is expected to be a tuple. They expand to a block of code containing multiple calls to the single-item macros.
+The package uses a helper macro `@define_verification` in `src/verify.jl` to streamline the definition of singular, internal, and batch macros.
 
-## Extending the Package
+```julia
+@define_verification(Singular, Plural, FunctionName, NArgs)
+```
+
+- `Singular`: Name of the singular macro (e.g., `verifytype`).
+- `Plural`: Name of the plural/batch macro (e.g., `verifytypes`).
+- `FunctionName`: Name of the backend function (e.g., `verifytype`).
+- `NArgs`: Number of arguments the check requires (1 or 2).
+
+### Extending the Package
 
 To add a new verification macro:
 
 1.  **Define the backend function** in `src/verify.jl`.
-    *   It should accept the value(s), expected condition, name, and location.
+    *   It should accept the value(s), (expected condition if NArgs=2), name, and location.
     *   It should return `nothing` on success.
     *   It should throw a descriptive error using `styled"..."` on failure.
-2.  **Define the macro** in `src/verify.jl`.
-    *   It should accept the arguments and an optional name.
-    *   It should expand to a call to the backend function, passing `$(QuoteNode(__source__))`.
-3.  **Define the batch macro** (optional but recommended).
-    *   It should loop over arguments and generate multiple calls to the single macro.
-4.  **Export the new macros** in `src/VerifyMacros.jl`.
-5.  **Add tests** in `test/runtests.jl` covering success, failure, and batch usage.
+2.  **Register the macro** using `@define_verification` in `src/verify.jl`.
+    *   Add a line: `@define_verification verifything verifythings verifything 2`
+3.  **Export the new macros** in `src/VerifyMacros.jl`.
+4.  **Add tests** in `test/runtests.jl` covering success, failure, and batch usage.
 
 ## Common Patterns
 

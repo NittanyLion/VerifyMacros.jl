@@ -129,5 +129,10 @@ If you prefer a single entry point, use `@verify`. The first argument is a symbo
 ```julia
 @verify :type x Float64      # expands to @verifytype x Float64
 @verify :keys d :a :b        # expands to @verifykeys d :a :b
-@verify :true 1 < 2          # expands to @verifytrue 1 < 2
-```
+
+---
+
+## 🤖 For AI Agents
+
+This package contains a dedicated guide for AI agents to help them understand and assist with `VerifyMacros.jl`.
+See [Agents.md](Agents.md) for detailed instructions on architecture, extension patterns, and design philosophy.
