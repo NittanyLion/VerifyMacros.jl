@@ -52,7 +52,7 @@ display(b3)
 display(b4)
 
 
-println("\nBenchmarking @verifytrue vs @argcheck (x > 0)")
+println("\nBenchmarking @verifykey vs @argcheckkeys")
 val3 = Dict( :x => 1, :y => 2, :z => 3 )
 b5 = @benchmark test_verify_keys($val3)
 b6 = @benchmark test_argcheck_keys($val3)

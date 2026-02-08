@@ -1,0 +1,8 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+VerifyMacros = "af467e45-a3cd-48cc-969b-d17b4696c409"
+
+[compat]
+Aqua = "0.8.14"
+Test = "1"

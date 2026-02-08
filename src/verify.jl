@@ -189,10 +189,12 @@ end
     error(styled"""TypeError: {magenta:$name} is of type {red:$Tᵛ}; was expecting a {green:$T}\n$location""")
 end
 
-@noinline function verifykey(d, key, name, location)
-    haskey(d, key) && return nothing
+@noinline function printkeyerror( d, key, name, location )
     error(styled"""KeyError: {magenta:$name} lacks key {green:$key}\n$location""")
 end
+
+
+verifykey(d, key, name, location) = haskey(d, key) ? nothing : printkeyerror( d, key, name, location )
 
 # --- Enhancements for UserDict/UserMarketDict (StablishCode.jl) ---
 # Note: These will only be active if UserDict/UserMarketDict are defined in the context.
@@ -212,60 +214,40 @@ if isdefined(@__MODULE__, :UserMarketDict)
 end
 # ------------------------------------------------------------------
 
-@noinline function verifyin(e, C, name, location)
-    e ∈ C && return nothing
-    error(styled"""ArgumentError: {magenta:$name} does not belong to {green:$C}\n$location""")
-end
 
-@noinline function verifyproperty(d, prop, name, location)
-    hasproperty(d, prop) && return nothing
-    error(styled"""KeyError: {magenta:$name} lacks property {green:$prop}\n$location""")
-end
+@noinline printinerror( e, C, name, location ) = error(styled"""ArgumentError: {magenta:$name} does not belong to {green:$C}\n$location""")
+verifyin(e, C, name, location) = e ∈ C ? nothing : printinerror( e, C, name, location )
+  
+@noinline printpropertyerror( d, prop, name, location  ) = error(styled"""KeyError: {magenta:$name} lacks property {green:$prop}\n$location""")
+verifyproperty(d, prop, name, location) = hasproperty(d, prop) ? nothing : printpropertyerror( d, prop, name, location )
+    
 
-function verifysupertype(d, sup, name, location)
-    d <: sup && return nothing
-    error(styled"""TypeError: {magenta:$d} was expected to be a subtype of {green:$sup}\n$location""")
-end
+@noinline printsupertypeerror(d, sup, name, location) = error(styled"""TypeError: {magenta:$d} was expected to be a subtype of {green:$sup}\n$location""")
+verifysupertype(d, sup, name, location) = d <: sup ? nothing : printsupertypeerror(d, sup, name, location)
 
-@noinline function verifyaxes(d, ax, name, location)
-    axes(d) == ax && return nothing
-    error(styled"""DimensionMismatch: {magenta:$name} has axes {red:$(axes(d))}: was expecting {green:$ax}\n$location""")
-end
+@noinline printaxeserror(d, ax, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has axes {red:$(axes(d))}: was expecting {green:$ax}\n$location""")
+verifyaxes(d, ax, name, location) = axes(d) == ax ? nothing : printaxeserror(d, ax, name, location)
 
-@noinline function verifyfield(s, f, name, location)
-    hasfield(s, f) && return nothing
-    error(styled"""KeyError: {magenta:$name} lacks field {green:$f}\n$location""")
-end
+@noinline printfielderror(s, f, name, location) = error(styled"""KeyError: {magenta:$name} lacks field {green:$f}\n$location""")
+verifyfield(s, f, name, location) = hasfield(s, f) ? nothing : printfielderror(s, f, name, location)
 
-@noinline function verifyequal(val, expected, name, location)
-    val == expected && return nothing
-    error(styled"""ArgumentError: {magenta:$name} is {red:$val}; was expecting {green:$expected}\n$location""")
-end
+@noinline printequalerror(val, expected, name, location) = error(styled"""ArgumentError: {magenta:$name} is {red:$val}; was expecting {green:$expected}\n$location""")
+verifyequal(val, expected, name, location) = val == expected ? nothing : printequalerror(val, expected, name, location)
 
-@noinline function verifylength(col, len, name, location)
-    length(col) == len && return nothing
-    error(styled"""DimensionMismatch: {magenta:$name} has length {red:$(length(col))}; was expecting {green:$len}\n$location""")
-end
+@noinline printlengtherror(col, len, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has length {red:$(length(col))}; was expecting {green:$len}\n$location""")
+verifylength(col, len, name, location) = length(col) == len ? nothing : printlengtherror(col, len, name, location)
 
-@noinline function verifysize(arr, sz, name, location)
-    size(arr) == sz && return nothing
-    error(styled"""DimensionMismatch: {magenta:$name} has size {red:$(size(arr))}; was expecting {green:$sz}\n$location""")
-end
+@noinline printsizererror(arr, sz, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has size {red:$(size(arr))}; was expecting {green:$sz}\n$location""")
+verifysize(arr, sz, name, location) = size(arr) == sz ? nothing : printsizererror(arr, sz, name, location)
 
-@noinline function verifyisfile(path, name, location)
-    isfile(path) && return nothing
-    error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a file\n$location""")
-end
+@noinline printisfileerror(path, name, location) = error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a file\n$location""")
+verifyisfile(path, name, location) = isfile(path) ? nothing : printisfileerror(path, name, location)
 
-@noinline function verifyisdir(path, name, location)
-    isdir(path) && return nothing
-    error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a directory\n$location""")
-end
+@noinline printisdirerror(path, name, location) = error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a directory\n$location""")
+verifyisdir(path, name, location) = isdir(path) ? nothing : printisdirerror(path, name, location)
 
-@noinline function verifytrue(cond, name, location)
-    cond && return nothing
-    error(styled"""AssertionError: {magenta:$name} is not true\n$location""")
-end
+@noinline printtrueerror( cond, name, location ) = error(styled"""AssertionError: {magenta:$name} is not true\n$location""")
+verifytrue(cond, name, location) = cond ? nothing : printtrueerror( cond, name, location )
 
 
 # ==============================================================================
@@ -274,18 +256,196 @@ end
 
 # Standard verifications
 @define_verification verifytype      verifytypes       verifytype      2
+@doc """
+    @verifytype(val, T, [name])
+
+Check that `val` is of type `T` (using `<:`).
+If `name` is omitted, it defaults to the string representation of `val`.
+Throws a styled error if the check fails.
+""" var"@verifytype"
+
+@doc """
+    @verifytypes((val, T), ...)
+
+Batch verification for types.
+Usage: `@verifytypes((val1, T1), (val2, T2))`
+""" var"@verifytypes"
+
+
 @define_verification verifyproperty  verifyproperties  verifyproperty  2
+@doc """
+    @verifyproperty(val, prop, [name])
+
+Check that `val` has property `prop` (using `hasproperty`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifyproperty"
+
+@doc """
+    @verifyproperties((val, prop), ...)
+
+Batch verification for properties.
+Usage: `@verifyproperties((val1, prop1), (val2, prop2))`
+""" var"@verifyproperties"
+
+
 @define_verification verifysupertype verifysupertypes  verifysupertype 2
+@doc """
+    @verifysupertype(T, Sup, [name])
+
+Check that `T` is a subtype of `Sup` (using `<:`).
+Throws a styled `TypeError` if the check fails.
+""" var"@verifysupertype"
+
+@doc """
+    @verifysupertypes((T, Sup), ...)
+
+Batch verification for supertypes.
+Usage: `@verifysupertypes((T1, Sup1), (T2, Sup2))`
+""" var"@verifysupertypes"
+
+
 @define_verification verifyaxes      verifyaxesm       verifyaxes      2
+@doc """
+    @verifyaxes(val, ax, [name])
+
+Check that `val` has axes `ax` (using `axes(val) == ax`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifyaxes"
+
+@doc """
+    @verifyaxesm((val, ax), ...)
+
+Batch verification for axes.
+Usage: `@verifyaxesm((val1, ax1), (val2, ax2))`
+""" var"@verifyaxesm"
+
+
 @define_verification verifyfield     verifyfields      verifyfield     2
+@doc """
+    @verifyfield(val, field, [name])
+
+Check that `val` has field `field` (using `hasfield`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifyfield"
+
+@doc """
+    @verifyfields((val, field), ...)
+
+Batch verification for fields.
+Usage: `@verifyfields((val1, field1), (val2, field2))`
+""" var"@verifyfields"
+
+
 @define_verification verifyin        verifyins         verifyin        2
+@doc """
+    @verifyin(val, collection, [name])
+
+Check that `val` is in `collection` (using `val ∈ collection`).
+Throws a styled `ArgumentError` if the check fails.
+""" var"@verifyin"
+
+@doc """
+    @verifyins((val, collection), ...)
+
+Batch verification for membership.
+Usage: `@verifyins((val1, col1), (val2, col2))`
+""" var"@verifyins"
+
+
 @define_verification verifyequal     verifyequals      verifyequal     2
+@doc """
+    @verifyequal(val, expected, [name])
+
+Check that `val` is equal to `expected` (using `==`).
+Throws a styled `ArgumentError` if the check fails.
+""" var"@verifyequal"
+
+@doc """
+    @verifyequals((val, expected), ...)
+
+Batch verification for equality.
+Usage: `@verifyequals((val1, exp1), (val2, exp2))`
+""" var"@verifyequals"
+
+
 @define_verification verifylength    verifylengths     verifylength    2
+@doc """
+    @verifylength(val, len, [name])
+
+Check that `val` has length `len` (using `length(val) == len`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifylength"
+
+@doc """
+    @verifylengths((val, len), ...)
+
+Batch verification for lengths.
+Usage: `@verifylengths((val1, len1), (val2, len2))`
+""" var"@verifylengths"
+
+
 @define_verification verifysize      verifysizes       verifysize      2
+@doc """
+    @verifysize(val, size, [name])
+
+Check that `val` has size `size` (using `size(val) == size`).
+Throws a styled `DimensionMismatch` if the check fails.
+""" var"@verifysize"
+
+@doc """
+    @verifysizes((val, size), ...)
+
+Batch verification for sizes.
+Usage: `@verifysizes((val1, size1), (val2, size2))`
+""" var"@verifysizes"
+
 
 @define_verification verifyisfile    verifyisfiles     verifyisfile    1
+@doc """
+    @verifyisfile(path, [name])
+
+Check that `path` is an existing file (using `isfile`).
+Throws a styled `SystemError` if the check fails.
+""" var"@verifyisfile"
+
+@doc """
+    @verifyisfiles(path, ...)
+
+Batch verification for files.
+Usage: `@verifyisfiles(path1, path2)` or `@verifyisfiles((path1, name1), ...)`
+""" var"@verifyisfiles"
+
+
 @define_verification verifyisdir     verifyisdirs      verifyisdir     1
+@doc """
+    @verifyisdir(path, [name])
+
+Check that `path` is an existing directory (using `isdir`).
+Throws a styled `SystemError` if the check fails.
+""" var"@verifyisdir"
+
+@doc """
+    @verifyisdirs(path, ...)
+
+Batch verification for directories.
+Usage: `@verifyisdirs(path1, path2)` or `@verifyisdirs((path1, name1), ...)`
+""" var"@verifyisdirs"
+
+
 @define_verification verifytrue      verifytrues       verifytrue      1
+@doc """
+    @verifytrue(cond, [name])
+
+Check that `cond` is true.
+Throws a styled `AssertionError` if the check fails.
+""" var"@verifytrue"
+
+@doc """
+    @verifytrues(cond, ...)
+
+Batch verification for boolean conditions.
+Usage: `@verifytrues(cond1, cond2)` or `@verifytrues((cond1, name1), ...)`
+""" var"@verifytrues"
 
 
 # ==============================================================================
@@ -303,6 +463,12 @@ end
 # But let's just generate it and then REDEFINE @verifykeys. Julia allows this.
 
 @define_verification verifykey       _verifykeys_stub  verifykey       2
+@doc """
+    @verifykey(dict, key, [name])
+
+Check that `dict` has key `key` (using `haskey`).
+Throws a styled `KeyError` if the check fails.
+""" var"@verifykey"
 
 """
     @verifykeys((dict1, key1), (dict2, key2), ...)

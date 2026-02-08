@@ -1,0 +1,10 @@
+# VerifyMacros.jl
+
+> A Julia package for runtime verification with descriptive, styled error messages.
+
+Runtime verification often involves repetitive boilerplate and generic error messages. VerifyMacros.jl provides a suite of macros to assert conditions (types, keys, files, etc.) and produces auto-generated, color-coded, and descriptive errors when those assertions fail.
+
+## Documentation
+
+- [Developer Guide (Agents.md)](Agents.md): Comprehensive guide for AI agents and developers on the architecture and design of the package.
+- [README](README.md): Main overview, installation instructions, usage examples, and comparison with ArgCheck.jl.

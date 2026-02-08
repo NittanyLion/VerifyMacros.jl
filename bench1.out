@@ -1,0 +1,65 @@
+Benchmarking @verifytype vs @argcheck (isa Int)
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  1.162 ns … 104.802 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     1.172 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.218 ns ±   1.506 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▁                           █                                
+  █▁▄▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▇▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▄▁▃ ▂
+  1.16 ns         Histogram: frequency by time        1.18 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  1.152 ns … 24.407 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     1.172 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   1.195 ns ±  0.651 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▁ ▇ █ ▄                                                    ▁
+  █▁█▁█▁█▁█▁▇▁▆▄▆▄▁▆▁▅▁▅▁▄▁▅▁▄▄▃▅▁▅▁▅▁▅▁▄▁▅▁▄▁▁▄▁▄▁▅▁▅▁▅▁▄▁▄ █
+  1.15 ns      Histogram: log(frequency) by time     1.42 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+Benchmarking @verifytrue vs @argcheck (x > 0)
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  6.232 ns … 55.597 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     6.342 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   6.521 ns ±  1.744 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  █▆                                                         ▁
+  ██▆▇▅▄▅▄▄▃▅▅▁▄▅▇▁▁▁▄▁▃▁▃▁▃▁▁▁▁▁▃▁▁▁▄▁▁▁▁▁▁▁▃▁▁▁▁▄▁▄▁▁▁▁▁▅▆ █
+  6.23 ns      Histogram: log(frequency) by time     12.8 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+BenchmarkTools.Trial: 10000 samples with 1000 evaluations per sample.
+ Range (min … max):  3.286 ns … 34.727 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     3.347 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   3.438 ns ±  1.177 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+     █▆                                                       
+  ▄▃▄██▇▂▂▂▂▂▁▁▂▂▂▂▂▂▂▂▂▁▂▂▂▂▂▂▁▂▂▂▂▂▁▂▁▂▂▂▂▁▂▂▂▂▁▂▂▂▂▂▂▂▂▂▂ ▂
+  3.29 ns        Histogram: frequency by time        4.22 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+
+Benchmarking @verifytrue vs @argcheck (x > 0)
+BenchmarkTools.Trial: 10000 samples with 997 evaluations per sample.
+ Range (min … max):  18.240 ns … 146.571 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     18.571 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   19.163 ns ±   4.378 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  █▆                                                           ▁
+  ██▇▆▅▅▅▅█▆▇▁▁▁▃▄▁▃▃▃▄▃▁▁▁▁▃▁▃▁▁▁▁▁▃▄▁▄▅▃▁▁▁▁▁▁▁▁▁▁▁▁▁▅▅▇▇▆▆▆ █
+  18.2 ns       Histogram: log(frequency) by time      38.5 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
+BenchmarkTools.Trial: 10000 samples with 999 evaluations per sample.
+ Range (min … max):  7.120 ns … 43.246 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     7.221 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   7.410 ns ±  1.583 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  ▄█                             ▁                           ▁
+  ██▄▅▅▇▄▄▃▄▅▅▄▄▄▃▄▅▅▄▅▅▄▃▅▆▁▁▁▁▃█▁▁▁▄▃▁▃▅▃▅▃▃▃▃▄▄▃▄▁▄▃▃▄▄▃▄ █
+  7.12 ns      Histogram: log(frequency) by time     11.6 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
