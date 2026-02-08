@@ -23,6 +23,18 @@ function test_argcheck_true(x)
     @argcheck x > 0
 end
 
+function test_verify_keys(D)
+    @verifykeys D :x :y :z
+end
+
+function test_argcheck_keys(D)
+    @argcheck haskey( D, :x )
+    @argcheck haskey( D, :y )
+    @argcheck haskey( D, :z )
+end
+
+
+
 println("Benchmarking @verifytype vs @argcheck (isa Int)")
 val = 1
 b1 = @benchmark test_verify($val)
@@ -38,3 +50,12 @@ b4 = @benchmark test_argcheck_true($val2)
 
 display(b3)
 display(b4)
+
+
+println("\nBenchmarking @verifytrue vs @argcheck (x > 0)")
+val3 = Dict( :x => 1, :y => 2, :z => 3 )
+b5 = @benchmark test_verify_keys($val3)
+b6 = @benchmark test_argcheck_keys($val3)
+
+display(b5)
+display(b6)
