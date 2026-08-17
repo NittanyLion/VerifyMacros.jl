@@ -47,6 +47,51 @@ function _unwrap_name(x)
 end
 
 # ==============================================================================
+#  Names and notes
+# ==============================================================================
+
+"""
+    WithNote(name, note)
+
+The `name` a verification backend reports, together with a user-supplied `note` — a thunk producing
+the message, so that interpolations in it are only evaluated when the verification actually fails.
+"""
+struct WithNote
+    name :: String
+    note
+end
+
+"""
+    resolvename( name )
+
+Split a backend `name` argument into `( name, note )`, where `note` is `nothing` unless the call
+site attached one.  Called only on the error path.
+"""
+resolvename( n :: WithNote ) = ( n.name, n.note() )
+resolvename( n ) = ( n, nothing )
+
+"""The note's rendering in an error message: its own line, or nothing at all."""
+notesuffix( note ) = note === nothing ? "" : styled"\n$note"
+
+"""
+    _name_code( val_expr, name_arg )
+
+The expression a verification macro passes as its backend's `name` argument.  With no explicit
+`name_arg` (`nothing`), it is the source text of `val_expr` — a plain string.  A string literal is
+taken as the name itself, replacing the source text.  Any other expression — typically a `styled`
+message with interpolations — keeps the source text as the name and rides along as a lazily
+evaluated note, shown on its own line when the verification fails.
+"""
+function _name_code( val_expr, name_arg )
+    autoname = string( _unwrap_name( val_expr ) )
+    name_arg === nothing && return autoname
+    na = _unwrap_name( name_arg )
+    na isa AbstractString && return string( na )
+    thunk = Expr( :->, Expr( :tuple ), Expr( :block, Expr( :escape, na ) ) )
+    return Expr( :call, GlobalRef( @__MODULE__, :WithNote ), autoname, thunk )
+end
+
+# ==============================================================================
 #  Refactoring Helper Macros
 # ==============================================================================
 
@@ -94,20 +139,20 @@ macro define_verification(Singular, Plural, FunctionName, NArgs)
             # Extract arguments
             if $NArgs == 1
                 val_expr = args[1]
-                name_expr = has_name ? args[2] : string(_unwrap_name(val_expr))
-                
+                name_expr = has_name ? args[2] : nothing
+
                 return quote
                     local val = $(esc(val_expr))
-                    $($func)(val, $(string(name_expr)), $(QuoteNode($(esc(:__source__)))))
+                    $($func)(val, $(_name_code(val_expr, name_expr)), $(QuoteNode($(esc(:__source__)))))
                 end
             else # NArgs == 2
                 val_expr = args[1]
                 expected_expr = args[2]
-                name_expr = has_name ? args[3] : string(_unwrap_name(val_expr))
-                
+                name_expr = has_name ? args[3] : nothing
+
                 return quote
                     local val, expected = $(esc(val_expr)), $(esc(expected_expr))
-                    $($func)(val, expected, $(string(name_expr)), $(QuoteNode($(esc(:__source__)))))
+                    $($func)(val, expected, $(_name_code(val_expr, name_expr)), $(QuoteNode($(esc(:__source__)))))
                 end
             end
         end
@@ -124,13 +169,13 @@ macro define_verification(Singular, Plural, FunctionName, NArgs)
                  val_expr, name, src = args[1], args[2], args[3]
                  return quote
                      local val = $(esc(val_expr))
-                     $($func)(val, $(string(name)), $(esc(src)))
+                     $($func)(val, $(_name_code(val_expr, name)), $(esc(src)))
                  end
              else
                  val_expr, expected_expr, name, src = args[1], args[2], args[3], args[4]
                  return quote
                      local val, expected = $(esc(val_expr)), $(esc(expected_expr))
-                     $($func)(val, expected, $(string(name)), $(esc(src)))
+                     $($func)(val, expected, $(_name_code(val_expr, name)), $(esc(src)))
                  end
              end
         end
@@ -149,11 +194,11 @@ macro define_verification(Singular, Plural, FunctionName, NArgs)
                     args = t.args
                     # Check argument count: NArgs or NArgs + 1 (with name)
                     if length(args) == $NArgs
-                        # Call internal without explicit name (pass value as name source)
+                        # Call internal without explicit name (pass the value's source text as name)
                         if $NArgs == 1
-                             push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), args[1], args[1], src))
+                             push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), args[1], string(_unwrap_name(args[1])), src))
                         else
-                             push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), args[1], args[2], args[1], src))
+                             push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), args[1], args[2], string(_unwrap_name(args[1])), src))
                         end
                     elseif length(args) == $NArgs + 1
                         # Call internal with explicit name
@@ -168,7 +213,7 @@ macro define_verification(Singular, Plural, FunctionName, NArgs)
                 else
                     # Allow single expression if NArgs=1 (special case for things like @verifyisfiles)
                     if $NArgs == 1
-                        push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), t, t, src))
+                        push!(blk.args, Expr(:macrocall, macro_ref, $(esc(:__source__)), t, string(_unwrap_name(t)), src))
                     else
                         error("All arguments in @$($QuoteNode(Plural)) must be tuples")
                     end
@@ -186,11 +231,13 @@ end
 
 @noinline function verifytype(::Tᵛ, T, name, location) where Tᵛ
     Tᵛ <: T && return nothing
-    error(styled"""TypeError: {magenta:$name} is of type {red:$Tᵛ}; was expecting a {green:$T}\n$location""")
+    nm, note = resolvename( name )
+    error(styled"""TypeError: {magenta:$nm} is of type {red:$Tᵛ}; was expecting a {green:$T}$(notesuffix(note))\n$location""")
 end
 
 @noinline function printkeyerror( d, key, name, location )
-    error(styled"""KeyError: {magenta:$name} lacks key {green:$key}\n$location""")
+    nm, note = resolvename( name )
+    error(styled"""KeyError: {magenta:$nm} lacks key {green:$key}$(notesuffix(note))\n$location""")
 end
 
 
@@ -202,51 +249,53 @@ verifykey(d, key, name, location) = haskey(d, key) ? nothing : printkeyerror( d,
 if isdefined(@__MODULE__, :UserDict)
     @noinline function verifykey(d::UserDict, key, name, location)
         haskey(d, key) && return nothing
-        error(styled"""KeyError: {magenta:$name} lacks key {green:$key}; this usually means that you failed to provide the correct and complete information in the {yellow:Dict} you passed to {blue:Estimate!}; you should be able to figure out from the key name where the problem is\n$location""")
+        nm, note = resolvename( name )
+        error(styled"""KeyError: {magenta:$nm} lacks key {green:$key}; this usually means that you failed to provide the correct and complete information in the {yellow:Dict} you passed to {blue:Estimate!}; you should be able to figure out from the key name where the problem is$(notesuffix(note))\n$location""")
     end
 end
 
 if isdefined(@__MODULE__, :UserMarketDict)
     @noinline function verifykey(d::UserMarketDict, key, name, location)
         haskey(d, key) && return nothing
-        error(styled"""KeyError: {magenta:$name} (which is a {red:market level Dict} lacks key {green:$key}; this usually means that you failed to provide the correct and complete information in the {yellow:Dict} you passed to {blue:Estimate!}; you should be able to figure out from the key name where the problem is\n$location""")
+        nm, note = resolvename( name )
+        error(styled"""KeyError: {magenta:$nm} (which is a {red:market level Dict} lacks key {green:$key}; this usually means that you failed to provide the correct and complete information in the {yellow:Dict} you passed to {blue:Estimate!}; you should be able to figure out from the key name where the problem is$(notesuffix(note))\n$location""")
     end
 end
 # ------------------------------------------------------------------
 
 
-@noinline printinerror( e, C, name, location ) = error(styled"""ArgumentError: {magenta:$name} does not belong to {green:$C}\n$location""")
+@noinline printinerror( e, C, name, location ) = ( (nm, note) = resolvename( name ); error(styled"""ArgumentError: {magenta:$nm} does not belong to {green:$C}$(notesuffix(note))\n$location""") )
 verifyin(e, C, name, location) = e ∈ C ? nothing : printinerror( e, C, name, location )
-  
-@noinline printpropertyerror( d, prop, name, location  ) = error(styled"""KeyError: {magenta:$name} lacks property {green:$prop}\n$location""")
-verifyproperty(d, prop, name, location) = hasproperty(d, prop) ? nothing : printpropertyerror( d, prop, name, location )
-    
 
-@noinline printsupertypeerror(d, sup, name, location) = error(styled"""TypeError: {magenta:$d} was expected to be a subtype of {green:$sup}\n$location""")
+@noinline printpropertyerror( d, prop, name, location  ) = ( (nm, note) = resolvename( name ); error(styled"""KeyError: {magenta:$nm} lacks property {green:$prop}$(notesuffix(note))\n$location""") )
+verifyproperty(d, prop, name, location) = hasproperty(d, prop) ? nothing : printpropertyerror( d, prop, name, location )
+
+
+@noinline printsupertypeerror(d, sup, name, location) = ( (nm, note) = resolvename( name ); error(styled"""TypeError: {magenta:$d} was expected to be a subtype of {green:$sup}$(notesuffix(note))\n$location""") )
 verifysupertype(d, sup, name, location) = d <: sup ? nothing : printsupertypeerror(d, sup, name, location)
 
-@noinline printaxeserror(d, ax, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has axes {red:$(axes(d))}: was expecting {green:$ax}\n$location""")
+@noinline printaxeserror(d, ax, name, location) = ( (nm, note) = resolvename( name ); error(styled"""DimensionMismatch: {magenta:$nm} has axes {red:$(axes(d))}: was expecting {green:$ax}$(notesuffix(note))\n$location""") )
 verifyaxes(d, ax, name, location) = axes(d) == ax ? nothing : printaxeserror(d, ax, name, location)
 
-@noinline printfielderror(s, f, name, location) = error(styled"""KeyError: {magenta:$name} lacks field {green:$f}\n$location""")
+@noinline printfielderror(s, f, name, location) = ( (nm, note) = resolvename( name ); error(styled"""KeyError: {magenta:$nm} lacks field {green:$f}$(notesuffix(note))\n$location""") )
 verifyfield(s, f, name, location) = hasfield(s, f) ? nothing : printfielderror(s, f, name, location)
 
-@noinline printequalerror(val, expected, name, location) = error(styled"""ArgumentError: {magenta:$name} is {red:$val}; was expecting {green:$expected}\n$location""")
+@noinline printequalerror(val, expected, name, location) = ( (nm, note) = resolvename( name ); error(styled"""ArgumentError: {magenta:$nm} is {red:$val}; was expecting {green:$expected}$(notesuffix(note))\n$location""") )
 verifyequal(val, expected, name, location) = val == expected ? nothing : printequalerror(val, expected, name, location)
 
-@noinline printlengtherror(col, len, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has length {red:$(length(col))}; was expecting {green:$len}\n$location""")
+@noinline printlengtherror(col, len, name, location) = ( (nm, note) = resolvename( name ); error(styled"""DimensionMismatch: {magenta:$nm} has length {red:$(length(col))}; was expecting {green:$len}$(notesuffix(note))\n$location""") )
 verifylength(col, len, name, location) = length(col) == len ? nothing : printlengtherror(col, len, name, location)
 
-@noinline printsizererror(arr, sz, name, location) = error(styled"""DimensionMismatch: {magenta:$name} has size {red:$(size(arr))}; was expecting {green:$sz}\n$location""")
+@noinline printsizererror(arr, sz, name, location) = ( (nm, note) = resolvename( name ); error(styled"""DimensionMismatch: {magenta:$nm} has size {red:$(size(arr))}; was expecting {green:$sz}$(notesuffix(note))\n$location""") )
 verifysize(arr, sz, name, location) = size(arr) == sz ? nothing : printsizererror(arr, sz, name, location)
 
-@noinline printisfileerror(path, name, location) = error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a file\n$location""")
+@noinline printisfileerror(path, name, location) = ( (nm, note) = resolvename( name ); error(styled"""SystemError: {magenta:$nm} (path: {cyan:$path}) is not a file$(notesuffix(note))\n$location""") )
 verifyisfile(path, name, location) = isfile(path) ? nothing : printisfileerror(path, name, location)
 
-@noinline printisdirerror(path, name, location) = error(styled"""SystemError: {magenta:$name} (path: {cyan:$path}) is not a directory\n$location""")
+@noinline printisdirerror(path, name, location) = ( (nm, note) = resolvename( name ); error(styled"""SystemError: {magenta:$nm} (path: {cyan:$path}) is not a directory$(notesuffix(note))\n$location""") )
 verifyisdir(path, name, location) = isdir(path) ? nothing : printisdirerror(path, name, location)
 
-@noinline printtrueerror( cond, name, location ) = error(styled"""AssertionError: {magenta:$name} is not true\n$location""")
+@noinline printtrueerror( cond, name, location ) = ( (nm, note) = resolvename( name ); error(styled"""AssertionError: {magenta:$nm} is not true$(notesuffix(note))\n$location""") )
 verifytrue(cond, name, location) = cond ? nothing : printtrueerror( cond, name, location )
 
 
